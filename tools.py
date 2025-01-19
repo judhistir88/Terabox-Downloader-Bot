@@ -5,6 +5,7 @@ from urllib.parse import parse_qs, urlparse
 import requests
 from telethon import TelegramClient
 from config import *
+from typing import Optional
 
 def get_bot_username(BOT_TOKEN):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/getMe"
@@ -18,7 +19,6 @@ def get_bot_username(BOT_TOKEN):
         return None
 
 BOT_USERNAME = get_bot_username(BOT_TOKEN)
-
 
 def check_url_patterns(url: str) -> bool:
     """
@@ -59,8 +59,7 @@ def check_url_patterns(url: str) -> bool:
 
     return False
 
-
-def extract_code_from_url(url: str) -> str | None:
+def extract_code_from_url(url: str) -> Optional[str]:
     """
     Extracts the code from a URL.
 
@@ -83,8 +82,7 @@ def extract_code_from_url(url: str) -> str | None:
 
     return None
 
-
-def get_urls_from_string(string: str) -> str | None:
+def get_urls_from_string(string: str) -> Optional[str]:
     """
     Extracts all URLs from a given string.
 
@@ -98,9 +96,8 @@ def get_urls_from_string(string: str) -> str | None:
     urls = re.findall(pattern, string)
     urls = [url for url in urls if check_url_patterns(url)]
     if not urls:
-        return
+        return None
     return urls[0]
-
 
 def extract_surl_from_url(url: str) -> str:
     """
@@ -120,7 +117,6 @@ def extract_surl_from_url(url: str) -> str:
         return surl[0]
     else:
         return False
-
 
 def get_formatted_size(size_bytes: int) -> str:
     """
@@ -143,7 +139,6 @@ def get_formatted_size(size_bytes: int) -> str:
         unit = "b"
 
     return f"{size:.2f} {unit}"
-
 
 def convert_seconds(seconds: int) -> str:
     """
@@ -168,7 +163,6 @@ def convert_seconds(seconds: int) -> str:
     else:
         return f"{remaining_seconds_final}s"
 
-
 async def is_user_on_chat(bot: TelegramClient, chat_id: int, user_id: int) -> bool:
     """
     Check if a user is present in a specific chat.
@@ -187,12 +181,11 @@ async def is_user_on_chat(bot: TelegramClient, chat_id: int, user_id: int) -> bo
     except:
         return False
 
-
 async def download_file(
     url: str,
     filename: str,
     callback=None,
-) -> str | bool:
+) -> Optional[str]:
     """
     Download a file from a URL to a specified location.
 
@@ -228,8 +221,7 @@ async def download_file(
         print(f"Error downloading file: {e}")
         return False
 
-
-def download_image_to_bytesio(url: str, filename: str) -> BytesIO | None:
+def download_image_to_bytesio(url: str, filename: str) -> Optional[BytesIO]:
     """
     Downloads an image from a URL and returns it as a BytesIO object.
 
