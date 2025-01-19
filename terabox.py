@@ -6,7 +6,7 @@ from selenium import __version__
 
 from config import COOKIE
 from tools import get_formatted_size
-
+from typing import Optional
 
 def check_url_patterns(url):
     patterns = [
@@ -38,7 +38,6 @@ def check_url_patterns(url):
 
     return False
 
-
 def get_urls_from_string(string: str) -> list[str]:
     """
     Extracts URLs from a given string.
@@ -56,8 +55,7 @@ def get_urls_from_string(string: str) -> list[str]:
         return []
     return urls[0]
 
-
-def find_between(data: str, first: str, last: str) -> str | None:
+def find_between(data: str, first: str, last: str) -> Optional[str]:
     """
     Searches for the first occurrence of the `first` string in `data`,
     and returns the text between the two strings.
@@ -78,8 +76,7 @@ def find_between(data: str, first: str, last: str) -> str | None:
     except ValueError:
         return None
 
-
-def extract_surl_from_url(url: str) -> str | None:
+def extract_surl_from_url(url: str) -> Optional[str]:
     """
     Extracts the surl parameter from a given URL.
 
@@ -87,7 +84,7 @@ def extract_surl_from_url(url: str) -> str | None:
         url (str): The URL from which to extract the surl parameter.
 
     Returns:
-        str: The surl parameter, or False if the parameter could not be found.
+        str: The surl parameter, or None if the parameter could not be found.
     """
     parsed_url = urlparse(url)
     query_params = parse_qs(parsed_url.query)
@@ -96,8 +93,7 @@ def extract_surl_from_url(url: str) -> str | None:
     if surl:
         return surl[0]
     else:
-        return False
-
+        return None
 
 def get_data(url: str):
     r = requests.Session()
