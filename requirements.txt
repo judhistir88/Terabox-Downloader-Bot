@@ -7,7 +7,7 @@ aiohttp[speedups]
 pillow
 hachoir
 requests
-redis
+pymongo
 selenium
 pytz
-psutil 
+psutil
