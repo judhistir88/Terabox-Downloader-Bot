@@ -3,7 +3,7 @@ import os
 import time
 from uuid import uuid4
 from datetime import datetime
-import redis
+import pymongo
 import telethon
 import telethon.tl.types
 from telethon import events
@@ -36,28 +36,21 @@ BOT_USERNAME = get_bot_username(BOT_TOKEN)
 
 bot = TelegramClient("tele", API_ID, API_HASH)
 
-db = redis.Redis(
-    host=REDIS_HOST,
-    port=REDIS_PORT,
-    password=REDIS_PASSWORD,
-    decode_responses=True,
-)
-
+client = pymongo.MongoClient(ATLAS_URI)
+db = client.get_database("terabox_downloader")
 
 bot_start_time = time.time()
-user_count = db.scard("users")
-user_ids = db.smembers("users")  # Retrieve user IDs
-
+user_count = db.users.count_documents({})
+user_ids = db.users.distinct("_id")
 
 def format_top_users(top_users):
     """Formats the top active users data for display."""
     formatted = ""
-    for i, (user_id, score) in enumerate(top_users, start=1):
+    for i, user in enumerate(top_users, start=1):
         formatted += (
-            f"{i}. User ID: [{user_id}](tg://user?id={user_id}) (Score: {score})\n"
+            f"{i}. User ID: [{user['_id']}](tg://user?id={user['_id']}) (Score: {user['score']})\n"
         )
     return formatted
-
 
 def format_file_stats(file_stats):
     """Formats the file type statistics for display."""
@@ -66,9 +59,7 @@ def format_file_stats(file_stats):
         formatted += f"{file_type}: {count}\n"
     return formatted
 
-
 # ----------------------------------------------------------------------------------------------------
-
 
 @bot.on(
     events.NewMessage(
@@ -84,15 +75,13 @@ async def ban_user(m: UpdateNewMessage):
     except ValueError:
         return await m.reply("Invalid user ID format.")
 
-    if db.sismember("banned_users", user_id):
+    if db.banned_users.find_one({"_id": user_id}):
         await m.reply("User is already banned.")
     else:
-        db.sadd("banned_users", user_id)
+        db.banned_users.insert_one({"_id": user_id})
         await m.reply(f"User ID {user_id} has been banned.")
 
-
 # ----------------------------------------------------------------------------------------------------
-
 
 @bot.on(
     events.NewMessage(
@@ -108,14 +97,12 @@ async def unban_user(m: UpdateNewMessage):
     except ValueError:
         return await m.reply("Invalid user ID format.")
 
-    if db.srem("banned_users", user_id):
+    if db.banned_users.delete_one({"_id": user_id}).deleted_count:
         await m.reply(f"User ID {user_id} has been unbanned.")
     else:
         await m.reply("User is not banned.")
 
-
 # ----------------------------------------------------------------------------------------------------
-
 
 @bot.on(events.NewMessage(pattern="/stats$", incoming=True, outgoing=False))
 async def stats_command(m: UpdateNewMessage):
