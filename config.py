@@ -8,11 +8,11 @@ BOT_TOKEN = environ.get("BOT_TOKEN", "")  # bot token
 # ATLAS
 ATLAS_URI = environ.get("ATLAS_URI", "")  # Atlas connection URI
 
-ADMINS = [6791744215]
-OWNER_ID = 6791744215  # Replace with your Telegram user ID
-PRIVATE_CHAT_ID = -100  # CHAT WHERE YOU WANT TO STORE VIDEOS
-USER_CHANNEL = -100
-DUMP_CHANNEL = -100
+ADMINS = [environ.get("ADMINS", "")]  # List of admin IDs
+OWNER_ID = environ.get("OWNER_ID", "")  # Owner ID
+PRIVATE_CHAT_ID = environ.get("PRIVATE_CHAT_ID", "")  # Private chat ID
+USER_CHANNEL = environ.get("USER_CHANNEL", "")  # User channel ID
+DUMP_CHANNEL = environ.get("DUMP_CHANNEL", "")  # Dump channel ID
 
 # Config
 COOKIE = environ.get("COOKIE", "")
