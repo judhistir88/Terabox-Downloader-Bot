@@ -36,7 +36,8 @@ BOT_USERNAME = get_bot_username(BOT_TOKEN)
 
 bot = TelegramClient("tele", API_ID, API_HASH)
 
-client = pymongo.MongoClient(ATLAS_URI)
+# Including SSL configuration in the MongoDB connection
+client = pymongo.MongoClient(ATLAS_URI, tls=True, tlsAllowInvalidCertificates=True)
 db = client.get_database("terabox_downloader")
 
 bot_start_time = time.time()
@@ -271,7 +272,7 @@ async def handle_message(m: Message):
     user_id = m.sender_id
     if db.sismember("banned_users", user_id):
         await m.reply(
-            "You are banned from using this bot. Conntact support for more info."
+            "You are banned from using this bot. Contact support for more info."
         )
         return
 
@@ -280,7 +281,7 @@ async def handle_message(m: Message):
         return await m.reply("Please enter a valid url.")
     check_if = await is_user_on_chat(bot, "@DextiNBots", m.peer_id)
     if not check_if:
-        return await m.reply("Please join @DextiNBots  then send me the link again.")
+        return await m.reply("Please join @DextiNBots then send me the link again.")
     check_if = await is_user_on_chat(bot, "@TeamDextiN", m.peer_id)
     if not check_if:
         return await m.reply("Please join @TeamDextiN then send me the link again.")
@@ -391,10 +392,10 @@ async def handle_message(m: Message):
             thumb=thumbnail if thumbnail else None,
             progress_callback=progress_bar,
             caption=f"""
-File Name: `{data['file_name']}`
-Size: **{data["size"]}**
+ File Name: `{data['file_name']}`
+ Size: **{data["size"]}**
 
-@DextiNBots
+ @DextiNBots
 """,
             supports_streaming=True,
             spoiler=True,
@@ -414,10 +415,10 @@ Size: **{data["size"]}**
             PRIVATE_CHAT_ID,
             download,
             caption=f"""
-File Name: `{data['file_name']}`
-Size: **{data["size"]}**
+ File Name: `{data['file_name']}`
+ Size: **{data["size"]}**
 
-@DextiNBots
+ @DextiNBots
 """,
             progress_callback=progress_bar,
             thumb=thumbnail if thumbnail else None,
